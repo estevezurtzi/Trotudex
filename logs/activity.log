@@ -1,0 +1,27 @@
+[2025-11-15 14:45:37] User: ash | Action: login_failed | Details: Wrong password | IP: ::1
+[2025-11-15 14:45:37] User: ash | Action: login_failed | Details: Wrong password | IP: ::1
+[2025-11-15 14:45:37] User: ash | Action: login_failed | Details: Wrong password | IP: ::1
+[2025-11-15 14:45:38] User: ash | Action: login_failed | Details: Wrong password | IP: ::1
+[2025-11-15 14:45:38] User: ash | Action: login_failed | Details: Wrong password | IP: ::1
+[2025-11-15 14:45:38] User: ash | Action: login_failed | Details: Wrong password | IP: ::1
+[2025-11-15 14:57:45] User: ash | Action: login_failed | Details: Wrong password | IP: ::1
+[2025-11-15 14:57:46] User: ash | Action: login_failed | Details: Wrong password | IP: ::1
+[2025-11-15 14:57:46] User: ash | Action: login_failed | Details: Wrong password | IP: ::1
+[2025-11-15 14:57:46] User: ash | Action: login_failed | Details: Wrong password | IP: ::1
+[2025-11-15 14:57:46] User: ash | Action: login_failed | Details: Wrong password | IP: ::1
+[2025-11-15 14:57:46] User: ash | Action: login_failed | Details: Wrong password | IP: ::1
+[2025-11-15 14:57:47] User: ash | Action: login_failed | Details: Wrong password | IP: ::1
+[2025-11-15 14:57:47] User: ash | Action: login_failed | Details: Wrong password | IP: ::1
+[2025-11-15 14:57:47] User: ash | Action: login_failed | Details: Wrong password | IP: ::1
+[2025-11-15 14:58:19] User: ash | Action: login_failed | Details: Wrong password | IP: ::1
+[2025-11-15 14:58:19] User: ash | Action: login_failed | Details: Wrong password | IP: ::1
+[2025-11-15 14:58:20] User: ash | Action: login_failed | Details: Wrong password | IP: ::1
+[2025-11-15 14:58:20] User: ash | Action: login_failed | Details: Wrong password | IP: ::1
+[2025-11-15 14:58:21] User: ash | Action: login_failed | Details: Wrong password | IP: ::1
+[2025-11-15 14:58:21] User: ash | Action: login_failed | Details: Wrong password | IP: ::1
+[2025-11-15 14:58:22] User: ash | Action: login_failed | Details: Wrong password | IP: ::1
+[2025-11-15 14:58:22] User: ash | Action: login_failed | Details: Wrong password | IP: ::1
+[2025-11-15 14:58:22] User: ash | Action: login_failed | Details: Wrong password | IP: ::1
+[2025-11-15 15:46:56] User: 65a1b2c3d4e5f | Action: login_success | Details:  | IP: ::1
+[2025-11-15 15:47:05] User: 65a1b2c3d4e5f | Action: profile_updated | Details: Username: ash, Email: ash@pokemon.com | IP: ::1
+[2025-11-15 15:47:09] User: 65a1b2c3d4e5f | Action: logout | Details:  | IP: ::1

@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trotudex</title>
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer/dist/model-viewer.min.js"></script>
+</head>
+<body class="light-theme">
+    <!-- Modal de Login/Registro -->
+    <div id="auth-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="auth-container">
+                <div class="auth-header">
+                    <div class="pokeball-logo-small"></div>
+                    <h2>Bienvenido a la Pokédex</h2>
+                    <p>Inicia sesión para guardar tu progreso, o continúa como invitado</p>
+                </div>
+                
+                <div class="auth-tabs">
+                    <button class="auth-tab active" data-tab="login">Iniciar Sesión</button>
+                    <button class="auth-tab" data-tab="register">Registrarse</button>
+                </div>
+                
+                <form id="login-form" class="auth-form active" novalidate>
+                    <div class="form-group">
+                        <label for="login-username">Usuario:</label>
+                        <input type="text" id="login-username" required aria-required="true" aria-describedby="login-username-help">
+                        <small id="login-username-help">Mínimo 3 caracteres</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Contraseña:</label>
+                        <input type="password" id="login-password" required aria-required="true" aria-describedby="login-password-help">
+                        <small id="login-password-help">Ingresa tu contraseña</small>
+                    </div>
+                    <button type="submit" class="pokedex-button auth-button" aria-label="Iniciar sesión">Iniciar Sesión</button>
+                    <div id="login-error" class="error-message" role="alert" aria-live="polite"></div>
+                </form>
+                
+                <form id="register-form" class="auth-form" novalidate>
+                    <div class="form-group">
+                        <label for="register-username">Usuario:</label>
+                        <input type="text" id="register-username" required minlength="3" maxlength="20" aria-required="true" aria-describedby="register-username-help">
+                        <small id="register-username-help">3-20 caracteres</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">Email:</label>
+                        <input type="email" id="register-email" required aria-required="true" aria-describedby="register-email-help">
+                        <small id="register-email-help">Formato: ejemplo@dominio.com</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Contraseña:</label>
+                        <input type="password" id="register-password" required minlength="6" maxlength="50" aria-required="true" aria-describedby="register-password-help">
+                        <small id="register-password-help">Mínimo 6 caracteres</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-confirm-password">Confirmar Contraseña:</label>
+                        <input type="password" id="register-confirm-password" required aria-required="true">
+                    </div>
+                    <button type="submit" class="pokedex-button auth-button" aria-label="Registrarse">Registrarse</button>
+                    <div id="register-error" class="error-message" role="alert" aria-live="polite"></div>
+                </form>
+                
+                <div class="auth-footer">
+                    <button id="continue-without-login" class="pokedex-button secondary">
+                        Continuar como Invitado
+                    </button>
+                    <p style="margin-top: 10px; font-size: 12px; color: #666;">
+                        Puedes iniciar sesión después desde el botón en la esquina superior izquierda
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barra de usuario -->
+    <div class="user-bar" id="user-bar">
+        <div class="user-info">
+            <img id="user-avatar" src="" alt="Avatar" class="user-avatar">
+            <span id="username-display" class="username">Invitado</span>
+        </div>
+        <div class="user-actions">
+            <button id="login-btn" class="pokedex-button small">Iniciar Sesión</button>
+            <button id="edit-profile-btn" class="pokedex-button small" style="display: none;">Editar Perfil</button>
+            <button id="logout-btn" class="pokedex-button small" style="display: none;">Cerrar Sesión</button>
+        </div>
+    </div>
+
+    <!-- Modal de Edición de Perfil -->
+    <div id="profile-modal" class="modal" style="display: none;">
+        <div class="modal-content profile-modal">
+            <div class="modal-header">
+                <h2>Editar Perfil</h2>
+                <button class="close-button">&times;</button>
+            </div>
+            <div class="profile-form">
+                <div class="avatar-section" id="avatar-section">
+                    <img id="profile-avatar" src="" alt="Avatar" class="profile-avatar">
+                    <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
+                    <button id="change-avatar-btn" class="pokedex-button small">Cambiar Avatar</button>
+                </div>
+                <div class="form-group">
+                    <label for="profile-username">Nombre de Usuario:</label>
+                    <input type="text" id="profile-username" required minlength="3">
+                </div>
+                <div class="form-group">
+                    <label for="profile-email">Email:</label>
+                    <input type="email" id="profile-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="current-password">Contraseña Actual (para cambios):</label>
+                    <input type="password" id="current-password">
+                </div>
+                <div class="form-group">
+                    <label for="new-password">Nueva Contraseña:</label>
+                    <input type="password" id="new-password" minlength="6">
+                </div>
+                <div class="form-actions">
+                    <button type="button" id="save-profile-btn" class="pokedex-button">Guardar Cambios</button>
+                    <button type="button" id="cancel-profile-btn" class="pokedex-button secondary">Cancelar</button>
+                </div>
+                <div id="profile-error" class="error-message"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controles de escritorio -->
+    <div class="theme-toggle-container">
+        <button id="theme-toggle" class="pokedex-button small">🌙 Oscuro</button>
+    <div class="sound-control-container">
+        <button id="sound-toggle" class="pokedex-button small">🔊 Sonido</button>
+            <div class="sound-volume-slider-wrapper">
+                <input type="range" id="volume-slider" class="volume-slider" min="0" max="100" value="100" aria-label="Controlar volumen">
+                <span id="volume-percent">100%</span>
+            </div>
+        </div>
+        <button id="shiny-toggle" class="pokedex-button small">✨ Shiny</button>
+        <button id="sprite-toggle" class="pokedex-button small sprite-toggle-2d">📐 2D</button>
+        <button id="random-pokemon" class="pokedex-button small">🎲 Aleatorio</button>
+    </div>
+
+    <!-- Contenido principal de la Pokédex -->
+    <div class="pokedex-container" id="pokedex-container">
+        <div class="pokedex-left">
+            <div class="pokedex-header">
+                <!-- LOGO Y TÍTULO CLICABLE -->
+                <div class="header-logo" id="header-logo" style="display: flex; align-items: center; gap: 15px; cursor: pointer;">
+                    <div class="pokeball-logo"></div>
+                    <h1>Trotudex</h1>
+                </div>
+                <div class="header-actions">
+                    <select id="region-filter" class="pokedex-button small">
+                        <option value="all">Todas las regiones</option>
+                        <option value="kanto">Kanto (1-151)</option>
+                        <option value="johto">Johto (152-251)</option>
+                        <option value="hoenn">Hoenn (252-386)</option>
+                        <option value="sinnoh">Sinnoh (387-493)</option>
+                        <option value="teselia">Teselia (494-649)</option>
+                        <option value="kalos">Kalos (650-721)</option>
+                        <option value="alola">Alola (722-809)</option>
+                        <option value="galar">Galar (810-898)</option>
+                        <option value="paldea">Paldea (899-1025)</option>
+                    </select>
+                    <button id="favorites-only" class="pokedex-button small filter-button">
+                        <span class="button-icon">⭐</span>    
+                    </button>
+                </div>
+            </div>
+            
+<!-- Búsqueda -->
+            <div class="search-container">
+                <div class="search-input-wrapper">
+                    <input type="text" id="search-input" placeholder="Buscar Pokémon por nombre, tipo o número..." aria-label="Buscar Pokémon" autocomplete="off">
+                    <button id="search-btn" class="pokedex-button small search-advanced-btn" aria-label="Buscar">🔍 Buscar</button>
+                </div>
+            </div>
+
+            <!-- Modal de Búsqueda Avanzada -->
+            <div id="advanced-search-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h2>🔍 Búsqueda Avanzada</h2>
+                <span class="close-button" id="close-advanced-search">&times;</span>
+                </div>
+
+                <div class="advanced-search-container">
+                <!-- Filtros por Tipo -->
+                <div class="filter-group active">
+                    <div class="filter-group-header">
+                    <h3>🛡️ Tipos</h3>
+                    <span class="filter-toggle">▼</span>
+                    </div>
+                    <div class="filter-group-content">
+                    <div class="type-filters-advanced">
+                        <div class="type-relationship-controls">
+                        <label>Relación entre tipos:</label>
+                        <div class="option-group">
+                            <label>
+                            <input type="radio" name="type-mode" id="type-any" value="any" checked>
+                            <span>Cualquier tipo seleccionado</span>
+                            </label>
+                            <label>
+                            <input type="radio" name="type-mode" id="type-all" value="both">
+                            <span>Deben tener todos los tipos seleccionados</span>
+                            </label>
+                        </div>
+                        </div>
+                        <div class="advanced-type-filters" id="advanced-type-filters">
+                        <!-- Los tipos se generarán dinámicamente -->
+                        </div>
+                    </div>
+                    </div>
+                </div>
+
+                <!-- Filtros por Estadísticas -->
+                <div class="filter-group">
+                    <div class="filter-group-header">
+                    <h3>📊 Estadísticas</h3>
+                    <span class="filter-toggle">▼</span>
+                    </div>
+                    <div class="filter-group-content">
+                    <div class="stat-filters-advanced">
+                        <div class="stat-filter-row">
+                        <label>PS:</label>
+                        <input type="number" id="stat-hp-min" placeholder="Mín" min="1" max="255">
+                        <span>-</span>
+                        <input type="number" id="stat-hp-max" placeholder="Máx" min="1" max="255">
+                        </div>
+                        <div class="stat-filter-row">
+                        <label>Ataque:</label>
+                        <input type="number" id="stat-attack-min" placeholder="Mín" min="1" max="255">
+                        <span>-</span>
+                        <input type="number" id="stat-attack-max" placeholder="Máx" min="1" max="255">
+                        </div>
+                        <div class="stat-filter-row">
+                        <label>Defensa:</label>
+                        <input type="number" id="stat-defense-min" placeholder="Mín" min="1" max="255">
+                        <span>-</span>
+                        <input type="number" id="stat-defense-max" placeholder="Máx" min="1" max="255">
+                        </div>
+                        <div class="stat-filter-row">
+                        <label>Ataque Especial:</label>
+                        <input type="number" id="stat-special-attack-min" placeholder="Mín" min="1" max="255">
+                        <span>-</span>
+                        <input type="number" id="stat-special-attack-max" placeholder="Máx" min="1" max="255">
+                        </div>
+                        <div class="stat-filter-row">
+                        <label>Defensa Especial:</label>
+                        <input type="number" id="stat-special-defense-min" placeholder="Mín" min="1" max="255">
+                        <span>-</span>
+                        <input type="number" id="stat-special-defense-max" placeholder="Máx" min="1" max="255">
+                        </div>
+                        <div class="stat-filter-row">
+                        <label>Velocidad:</label>
+                        <input type="number" id="stat-speed-min" placeholder="Mín" min="1" max="255">
+                        <span>-</span>
+                        <input type="number" id="stat-speed-max" placeholder="Máx" min="1" max="255">
+                        </div>
+                        <div class="stat-filter-row">
+                        <label>BST Total:</label>
+                        <input type="number" id="stat-total-min" placeholder="Mín" min="1" max="800">
+                        <span>-</span>
+                        <input type="number" id="stat-total-max" placeholder="Máx" min="1" max="800">
+                        </div>
+                    </div>
+                    </div>
+                </div>
+
+                <!-- Filtros por Características Físicas -->
+                <div class="filter-group">
+                    <div class="filter-group-header">
+                    <h3>📏 Características Físicas</h3>
+                    <span class="filter-toggle">▼</span>
+                    </div>
+                    <div class="filter-group-content">
+                    <div class="physical-filters">
+                        <div class="physical-filter-row">
+                        <label>Altura:</label>
+                        <input type="number" id="height-min" placeholder="Mín" min="0.1" max="20" step="0.1">
+                        <span>-</span>
+                        <input type="number" id="height-max" placeholder="Máx" min="0.1" max="20" step="0.1">
+                        <span>m</span>
+                        </div>
+                        <div class="physical-filter-row">
+                        <label>Peso:</label>
+                        <input type="number" id="weight-min" placeholder="Mín" min="0.1" max="1000" step="0.1">
+                        <span>-</span>
+                        <input type="number" id="weight-max" placeholder="Máx" min="0.1" max="1000" step="0.1">
+                        <span>kg</span>
+                        </div>
+                        <div class="physical-filter-row">
+                        <label>Color:</label>
+                        <select id="color-filter">
+                            <option value="">Cualquier color</option>
+                            <option value="black">Negro</option>
+                            <option value="blue">Azul</option>
+                            <option value="brown">Marrón</option>
+                            <option value="gray">Gris</option>
+                            <option value="green">Verde</option>
+                            <option value="pink">Rosa</option>
+                            <option value="purple">Púrpura</option>
+                            <option value="red">Rojo</option>
+                            <option value="white">Blanco</option>
+                            <option value="yellow">Amarillo</option>
+                        </select>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+
+                <!-- Filtros por Habilidades y Movimientos -->
+                <div class="filter-group">
+                    <div class="filter-group-header">
+                    <h3>⚡ Habilidades y Movimientos</h3>
+                    <span class="filter-toggle">▼</span>
+                    </div>
+                    <div class="filter-group-content">
+                    <div class="ability-move-filters">
+                        <div class="ability-filter-row">
+                        <label>Habilidad:</label>
+                        <input type="text" id="ability-filter" placeholder="Ej: Intimidación, Cuerpo Llama...">
+                        </div>
+                        <div class="move-filter-row">
+                        <label>Movimiento:</label>
+                        <input type="text" id="move-filter" placeholder="Ej: Lanzallamas, Rayo Hielo...">
+                        </div>
+                        <div class="move-type-filter-row">
+                        <label>Tipo de Movimiento:</label>
+                        <select id="move-type-filter">
+                            <option value="">Cualquier tipo</option>
+                            <!-- Los tipos se generarán dinámicamente -->
+                        </select>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+
+                <!-- Acciones -->
+                <div class="advanced-search-actions">
+                    <button id="apply-advanced-search" class="pokedex-button">🔍 Buscar Pokémon</button>
+                    <button id="reset-advanced-search" class="pokedex-button secondary">🔄 Restablecer</button>
+                    <button id="close-advanced-search-2" class="pokedex-button secondary">✕ Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+            <div id="search-results-modal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h2>📋 Resultados de la búsqueda</h2>
+                    <span class="close-button" id="close-results">&times;</span>
+                    </div>
+
+                    <div id="search-results-container">
+                    <!-- Aquí se mostrarán los Pokémon filtrados -->
+                    <div id="results-grid" class="pokemon-grid"></div>
+                    </div>
+
+                    <div class="advanced-search-actions">
+                    <button id="back-to-filters" class="pokedex-button secondary">⬅️ Volver a filtros</button>
+                    <button id="close-results-2" class="pokedex-button secondary">✕ Cerrar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pokemon-grid" id="pokemon-grid">
+                <div class="loading">Cargando Pokémon...</div>
+            </div>
+        </div>
+        
+        <div class="pokedex-right">
+            <div class="pokemon-detail" id="pokemon-detail">
+                <div class="detail-header">
+                    <div class="placeholder-img">Imagen Pokémon</div>
+                    <div class="detail-title">
+                        <div class="detail-name">Selecciona un Pokémon</div>
+                        <div class="detail-id">#???</div>
+                        <div class="detail-actions">
+                            <button id="favorite-btn" class="pokedex-button small">
+                                <span class="button-icon">☆</span> Favorito
+                            </button>
+                            <button id="team-add-btn" class="pokedex-button small team-add-btn">
+                                <span class="button-icon">⚔️</span> Equipo
+                            </button>
+                            <button id="female-toggle" class="pokedex-button small inactive">
+                                <span id="gender-display">♂</span> Género
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="detail-types">
+                    <span class="type-badge">Tipo</span>
+                </div>
+                <p>Haz clic en un Pokémon para ver sus detalles</p>
+            </div>
+            
+            <div class="tabs-container">
+                <div class="tabs">
+                    <button class="tab-button active" data-tab="stats">Estadísticas</button>
+                    <button class="tab-button" data-tab="info">Información</button>
+                    <button class="tab-button" data-tab="evolution">Evoluciones</button>
+                    <button class="tab-button" data-tab="moves">Movimientos</button>
+                    <button class="tab-button" data-tab="weaknesses">Debilidades</button>
+                </div>
+                
+                <div class="tab-content">
+                    <div id="stats-tab" class="tab-pane active">
+                        <div class="stats-container">
+                            <div class="stats-title">Estadísticas Base</div>
+                            <div id="stats-list">
+                                <p>Selecciona un Pokémon para ver sus estadísticas</p>
+                            </div>
+                            <div class="stats-comparison" id="stats-comparison" style="display: none;">
+                                <h4>Comparación</h4>
+                                <div id="comparison-chart"></div>
+                            </div>
+                        </div>
+                    </div>                    
+                    <div id="info-tab" class="tab-pane">
+                        <div class="info-container">
+                            <div class="info-item">
+                                <span class="info-label">Altura:</span>
+                                <span id="info-height">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Peso:</span>
+                                <span id="info-weight">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Especie:</span>
+                                <span id="info-species">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Habilidades:</span>
+                                <span id="info-abilities">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Forma Corporal:</span>
+                                <span id="info-body-shape">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Grupo de Huevo:</span>
+                                <span id="info-egg-groups">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Ratio de Género:</span>
+                                <span id="info-gender-ratio">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Tasa de Captura:</span>
+                                <span id="info-capture-rate">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Descripción:</span>
+                                <p id="info-description">Selecciona un Pokémon para ver su descripción</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="evolution-tab" class="tab-pane">
+                        <div class="evolution-container">
+                            <div id="evolution-chain">
+                                <p>Selecciona un Pokémon para ver su cadena evolutiva</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="moves-tab" class="tab-pane">
+                        <div class="moves-container">
+                            <div id="moves-list">
+                                <p>Selecciona un Pokémon para ver sus movimientos</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="weaknesses-tab" class="tab-pane">
+                        <div class="weaknesses-container">
+                            <div id="weaknesses-chart">
+                                <p>Selecciona un Pokémon para ver sus debilidades y resistencias</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pokedex-buttons">
+                <button class="pokedex-button" id="prev-button">◀ Anterior</button>
+                <button class="pokedex-button" id="history-button" title="Ver historial">📜 Historial</button>
+                <button class="pokedex-button" id="next-button">Siguiente ▶</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Equipos -->
+    <div id="team-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2>Mi Equipo Pokémon</h2>
+                <button class="close-button">&times;</button>
+            </div>
+            <div class="team-container">
+                <div class="team-slots">
+                    <div class="team-slot" data-slot="1">
+                        <div class="slot-empty">Vacío</div>
+                        <div class="slot-content" style="display: none;">
+                            <img class="slot-img" src="" alt="">
+                            <div class="slot-name"></div>
+                            <button class="slot-remove">✕</button>
+                        </div>
+                    </div>
+                    <div class="team-slot" data-slot="2">
+                        <div class="slot-empty">Vacío</div>
+                        <div class="slot-content" style="display: none;">
+                            <img class="slot-img" src="" alt="">
+                            <div class="slot-name"></div>
+                            <button class="slot-remove">✕</button>
+                        </div>
+                    </div>
+                    <div class="team-slot" data-slot="3">
+                        <div class="slot-empty">Vacío</div>
+                        <div class="slot-content" style="display: none;">
+                            <img class="slot-img" src="" alt="">
+                            <div class="slot-name"></div>
+                            <button class="slot-remove">✕</button>
+                        </div>
+                    </div>
+                    <div class="team-slot" data-slot="4">
+                        <div class="slot-empty">Vacío</div>
+                        <div class="slot-content" style="display: none;">
+                            <img class="slot-img" src="" alt="">
+                            <div class="slot-name"></div>
+                            <button class="slot-remove">✕</button>
+                        </div>
+                    </div>
+                    <div class="team-slot" data-slot="5">
+                        <div class="slot-empty">Vacío</div>
+                        <div class="slot-content" style="display: none;">
+                            <img class="slot-img" src="" alt="">
+                            <div class="slot-name"></div>
+                            <button class="slot-remove">✕</button>
+                        </div>
+                    </div>
+                    <div class="team-slot" data-slot="6">
+                        <div class="slot-empty">Vacío</div>
+                        <div class="slot-content" style="display: none;">
+                            <img class="slot-img" src="" alt="">
+                            <div class="slot-name"></div>
+                            <button class="slot-remove">✕</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="team-actions">
+                    <button id="save-team" class="pokedex-button">💾 Guardar Equipo</button>
+                    <button id="load-team" class="pokedex-button">📂 Cargar Equipo</button>
+                    <button id="clear-team" class="pokedex-button secondary">🗑️ Limpiar Equipo</button>
+                </div>
+                <div class="team-stats" id="team-stats" style="display: none;">
+                    <h3>Estadísticas del Equipo</h3>
+                    <div id="team-type-coverage"></div>
+                    <div id="team-weaknesses"></div>
+                </div>
+                <div class="team-instructions">
+                    <p><strong>Instrucciones:</strong></p>
+                    <ul>
+                        <li>Haz clic en "Añadir al equipo" en cualquier Pokémon para agregarlo</li>
+                        <li>Cada equipo puede tener máximo 6 Pokémon</li>
+                        <li>Puedes guardar y cargar múltiples equipos</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Comparación -->
+    <div id="compare-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 1200px;">
+            <div class="modal-header">
+                <h2>Comparar Pokémon</h2>
+                <button class="close-button">&times;</button>
+            </div>
+            
+            <div class="compare-container" id="compare-container">
+                <!-- Selector de Pokémon -->
+                <div class="compare-selector">
+                    <h4>Selecciona hasta 6 Pokémon para comparar</h4>
+                    <div class="compare-slots-grid">
+                        <div class="compare-slot" data-slot="1">
+                            <div class="slot-empty">
+                                <div class="slot-plus">+</div>
+                                <div>Añadir Pokémon</div>
+                            </div>
+                            <div class="slot-content" style="display: none;">
+                                <img class="slot-img" src="" alt="">
+                                <div class="slot-name"></div>
+                                <button class="slot-remove">✕</button>
+                            </div>
+                        </div>
+                        <div class="compare-slot" data-slot="2">
+                            <div class="slot-empty">
+                                <div class="slot-plus">+</div>
+                                <div>Añadir Pokémon</div>
+                            </div>
+                            <div class="slot-content" style="display: none;">
+                                <img class="slot-img" src="" alt="">
+                                <div class="slot-name"></div>
+                                <button class="slot-remove">✕</button>
+                            </div>
+                        </div>
+                        <div class="compare-slot" data-slot="3">
+                            <div class="slot-empty">
+                                <div class="slot-plus">+</div>
+                                <div>Añadir Pokémon</div>
+                            </div>
+                            <div class="slot-content" style="display: none;">
+                                <img class="slot-img" src="" alt="">
+                                <div class="slot-name"></div>
+                                <button class="slot-remove">✕</button>
+                            </div>
+                        </div>
+                        <div class="compare-slot" data-slot="4">
+                            <div class="slot-empty">
+                                <div class="slot-plus">+</div>
+                                <div>Añadir Pokémon</div>
+                            </div>
+                            <div class="slot-content" style="display: none;">
+                                <img class="slot-img" src="" alt="">
+                                <div class="slot-name"></div>
+                                <button class="slot-remove">✕</button>
+                            </div>
+                        </div>
+                        <div class="compare-slot" data-slot="5">
+                            <div class="slot-empty">
+                                <div class="slot-plus">+</div>
+                                <div>Añadir Pokémon</div>
+                            </div>
+                            <div class="slot-content" style="display: none;">
+                                <img class="slot-img" src="" alt="">
+                                <div class="slot-name"></div>
+                                <button class="slot-remove">✕</button>
+                            </div>
+                        </div>
+                        <div class="compare-slot" data-slot="6">
+                            <div class="slot-empty">
+                                <div class="slot-plus">+</div>
+                                <div>Añadir Pokémon</div>
+                            </div>
+                            <div class="slot-content" style="display: none;">
+                                <img class="slot-img" src="" alt="">
+                                <div class="slot-name"></div>
+                                <button class="slot-remove">✕</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="compare-quick-actions">
+                        <button id="compare-from-team" class="pokedex-button small">Usar Mi Equipo</button>
+                        <button id="compare-random" class="pokedex-button small">Aleatorio</button>
+                        <button id="compare-by-type" class="pokedex-button small">Por Tipo</button>
+                    </div>
+                </div>
+
+                <!-- Tabs de comparación -->
+                <div class="compare-tabs">
+                    <button class="compare-tab-button active" data-tab="table">📊 Tabla</button>
+                    <button class="compare-tab-button" data-tab="radar">📈 Gráfico Radar</button>
+                    <button class="compare-tab-button" data-tab="types">🛡️ Análisis de Tipos</button>
+                    <button class="compare-tab-button" data-tab="sidebyside">👥 Vista Comparativa</button>
+                </div>
+
+                <!-- Contenido de las tabs -->
+                <div class="compare-tab-content">
+                    <!-- Tabla comparativa -->
+                    <div id="compare-table" class="compare-tab-pane active">
+                        <div class="comparison-table-container">
+                            <table class="comparison-table">
+                                <thead>
+                                    <tr>
+                                        <th class="stat-header">Stat</th>
+                                        <!-- Las columnas de Pokémon se generarán dinámicamente -->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Las filas de stats se generarán dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="comparison-summary">
+                            <h4>Resumen Comparativo</h4>
+                            <div id="comparison-stats-summary" class="stats-summary">
+                                <!-- Resumen se generará dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gráfico radar -->
+                    <div id="compare-radar" class="compare-tab-pane">
+                        <div class="radar-chart-container">
+                            <canvas id="radar-chart" width="600" height="400"></canvas>
+                        </div>
+                        <div class="radar-legend" id="radar-legend">
+                            <!-- Leyenda se generará dinámicamente -->
+                        </div>
+                    </div>
+
+                    <!-- Análisis de tipos -->
+                    <div id="compare-types" class="compare-tab-pane">
+                        <div class="type-analysis-section">
+                            <h4>🛡️ Cobertura de Tipos del Grupo</h4>
+                            <div id="type-coverage-analysis" class="coverage-grid">
+                                <!-- Análisis de cobertura se generará dinámicamente -->
+                            </div>
+                        </div>
+                        
+                        <div class="type-analysis-section">
+                            <h4>⚔️ Debilidades y Resistencias Comunes</h4>
+                            <div id="shared-weaknesses" class="weakness-analysis">
+                                <!-- Debilidades comunes se generarán dinámicamente -->
+                            </div>
+                        </div>
+                        
+                        <div class="type-analysis-section">
+                            <h4>📊 Balance de Tipos</h4>
+                            <div id="type-balance" class="balance-chart">
+                                <!-- Balance se generará dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vista side-by-side -->
+                    <div id="compare-sidebyside" class="compare-tab-pane">
+                        <div class="sidebyside-container" id="sidebyside-container">
+                            <!-- Vistas individuales de Pokémon se generarán dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="compare-actions">
+                <button id="clear-comparison" class="pokedex-button secondary">🗑️ Limpiar</button>
+                <button id="export-comparison" class="pokedex-button">💾 Exportar Grupo</button>
+                <button id="import-comparison" class="pokedex-button">📂 Importar Grupo</button>
+                <button id="save-comparison-group" class="pokedex-button">⭐ Guardar Grupo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Tabla de Tipos -->
+    <div id="type-chart-modal" class="modal" style="display: none;">
+        <div class="modal-content type-chart-modal">
+            <div class="modal-header">
+                <h2>Tabla de Efectividad de Tipos Pokémon</h2>
+                <button class="close-button">&times;</button>
+            </div>
+            <div class="type-chart-container">
+                <div class="type-chart-controls">
+                    <div class="effectiveness-filter">
+                        <label>Filtrar por efectividad:</label>
+                        <select id="effectiveness-filter" class="pokedex-button small">
+                            <option value="all">Todas las efectividades</option>
+                            <option value="2">2× (Efectivo)</option>
+                            <option value="1">1× (Normal)</option>
+                            <option value="0.5">0.5× (Poco efectivo)</option>
+                            <option value="0">0× (Sin efecto)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="type-chart-table-container">
+                    <div id="type-chart-table" class="type-chart-table">
+                        <!-- La tabla se generará dinámicamente -->
+                    </div>
+                </div>
+                
+                <div class="type-chart-legend">
+                    <h4>📊 Leyenda de Efectividad:</h4>
+                    <div class="legend-items">
+                        <div class="legend-item">
+                            <span class="legend-color effectiveness-2"></span>
+                            <span class="legend-text">2× - Efectivo</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color effectiveness-1"></span>
+                            <span class="legend-text">1× - Normal</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color effectiveness-05"></span>
+                            <span class="legend-text">0.5× - Poco efectivo</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color effectiveness-0"></span>
+                            <span class="legend-text">0× - Sin efecto</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="type-chart-info">
+                    <h4>💡 Cómo leer la tabla:</h4>
+                    <ul>
+                        <li><strong>Vista de Ataque:</strong> Muestra cuán efectivo es cada tipo de ataque contra cada tipo de Pokémon</li>
+                        <li><strong>Vista de Defensa:</strong> Muestra cuán vulnerable es cada tipo de Pokémon a cada tipo de ataque</li>
+                        <li><strong>Haz clic en cualquier celda</strong> para ver detalles específicos de esa combinación de tipos</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Quiz - Añadir junto a los otros modales -->
+    <div id="quiz-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2>🎯 Quiz Pokémon</h2>
+                <button class="close-button">&times;</button>
+            </div>
+            <div class="quiz-container">
+                <!-- Pantalla de selección de modo -->
+                <div id="quiz-mode-selection" class="quiz-screen active">
+                    <div class="quiz-header">
+                        <div class="pokeball-logo-small"></div>
+                        <h3>Selecciona un modo de quiz</h3>
+                        <p>Pon a prueba tus conocimientos Pokémon</p>
+                    </div>
+                    
+                    <div class="quiz-modes-grid">
+                        <div class="quiz-mode-card" data-mode="types">
+                            <div class="mode-icon">⚡</div>
+                            <h4>Quiz de Tipos</h4>
+                            <p>¿Qué tipo es efectivo contra...?</p>
+                            <div class="mode-difficulty">
+                                <span class="difficulty-badge easy">Fácil</span>
+                                <span class="difficulty-badge medium">Medio</span>
+                                <span class="difficulty-badge hard">Difícil</span>
+                            </div>
+                        </div>
+                        
+                        <div class="quiz-mode-card" data-mode="names">
+                            <div class="mode-icon">👁️</div>
+                            <h4>Quiz de Nombres</h4>
+                            <p>Identifica Pokémon por imagen</p>
+                            <div class="mode-difficulty">
+                                <span class="difficulty-badge easy">Fácil</span>
+                                <span class="difficulty-badge medium">Medio</span>
+                                <span class="difficulty-badge hard">Difícil</span>
+                            </div>
+                        </div>
+                        
+                        <div class="quiz-mode-card" data-mode="stats">
+                            <div class="mode-icon">📊</div>
+                            <h4>Quiz de Stats</h4>
+                            <p>Preguntas sobre estadísticas</p>
+                            <div class="mode-difficulty">
+                                <span class="difficulty-badge medium">Medio</span>
+                                <span class="difficulty-badge hard">Difícil</span>
+                            </div>
+                        </div>
+                        
+                        <div class="quiz-mode-card" data-mode="evolutions">
+                            <div class="mode-icon">🔄</div>
+                            <h4>Quiz de Evoluciones</h4>
+                            <p>Cadena evolutiva de Pokémon</p>
+                            <div class="mode-difficulty">
+                                <span class="difficulty-badge easy">Fácil</span>
+                                <span class="difficulty-badge hard">Difícil</span>
+                            </div>
+                        </div>
+                        
+                        <div class="quiz-mode-card" data-mode="abilities">
+                            <div class="mode-icon">⚙️</div>
+                            <h4>Quiz de Habilidades</h4>
+                            <p>Identifica habilidades de Pokémon</p>
+                            <div class="mode-difficulty">
+                                <span class="difficulty-badge medium">Medio</span>
+                                <span class="difficulty-badge hard">Difícil</span>
+                            </div>
+                        </div>
+                        
+                        <div class="quiz-mode-card" data-mode="moves">
+                            <div class="mode-icon">💥</div>
+                            <h4>Quiz de Movimientos</h4>
+                            <p>¿Qué movimientos aprende?</p>
+                            <div class="mode-difficulty">
+                                <span class="difficulty-badge medium">Medio</span>
+                                <span class="difficulty-badge hard">Difícil</span>
+                            </div>
+                        </div>
+                        
+                        <div class="quiz-mode-card" data-mode="generations">
+                            <div class="mode-icon">📚</div>
+                            <h4>Quiz de Generaciones</h4>
+                            <p>¿De qué generación es?</p>
+                            <div class="mode-difficulty">
+                                <span class="difficulty-badge easy">Fácil</span>
+                                <span class="difficulty-badge hard">Difícil</span>
+                            </div>
+                        </div>
+                        
+                        <div class="quiz-mode-card" data-mode="comparative">
+                            <div class="mode-icon">⚖️</div>
+                            <h4>Quiz Comparativo</h4>
+                            <p>Compara estadísticas de Pokémon</p>
+                            <div class="mode-difficulty">
+                                <span class="difficulty-badge medium">Medio</span>
+                                <span class="difficulty-badge hard">Difícil</span>
+                            </div>
+                        </div>
+                        
+                        <div class="quiz-mode-card" data-mode="weaknesses">
+                            <div class="mode-icon">🛡️</div>
+                            <h4>Quiz de Debilidades</h4>
+                            <p>Conoce las resistencias de tipos</p>
+                            <div class="mode-difficulty">
+                                <span class="difficulty-badge easy">Fácil</span>
+                                <span class="difficulty-badge hard">Difícil</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="quiz-difficulty-selection">
+                        <h4>Dificultad:</h4>
+                        <div class="difficulty-options">
+                            <button class="difficulty-btn active" data-difficulty="easy">Fácil</button>
+                            <button class="difficulty-btn" data-difficulty="medium">Medio</button>
+                            <button class="difficulty-btn" data-difficulty="hard">Difícil</button>
+                        </div>
+                    </div>
+                    
+                    <div class="quiz-stats-preview">
+                        <h4>Tus Estadísticas</h4>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-value" id="total-quizzes">0</span>
+                                <span class="stat-label">Quizzes</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="high-score">0</span>
+                                <span class="stat-label">Mejor Puntuación</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="correct-answers">0%</span>
+                                <span class="stat-label">Precisión</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pantalla de pregunta -->
+                <div id="quiz-question-screen" class="quiz-screen">
+                    <div class="quiz-progress">
+                        <div class="progress-info">
+                            <span id="quiz-progress-text">Pregunta 1/15</span>
+                            <span class="quiz-score">Puntos: <span id="current-score">0</span></span>
+                        </div>
+                        <div class="progress-bar">
+                            <div id="quiz-progress-bar" class="progress-bar-fill"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="quiz-question-container">
+                        <div id="quiz-question" class="quiz-question">
+                            <!-- La pregunta se insertará aquí -->
+                        </div>
+                        
+                        <div id="quiz-image-container" class="quiz-image-container" style="display: none;">
+                            <img id="quiz-pokemon-image" src="" alt="Pokémon" class="quiz-pokemon-img">
+                            <div id="quiz-silhouette" class="silhouette-overlay" style="display: none;"></div>
+                        </div>
+                        
+                        <div id="quiz-options" class="quiz-options">
+                            <!-- Las opciones se insertarán aquí -->
+                        </div>
+                    </div>
+                    
+                    <div class="quiz-footer">
+                        <div class="quiz-lives">
+                            <span class="lives-label">Vidas:</span>
+                            <div class="hearts-container" id="hearts-container">
+                                <!-- Corazones se insertarán aquí -->
+                            </div>
+                        </div>
+                        <div class="quiz-actions">
+                            <button id="quiz-skip" class="pokedex-button secondary">Saltar</button>
+                            <button id="quiz-hint" class="pokedex-button secondary">Pista</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pantalla de resultados -->
+                <div id="quiz-results-screen" class="quiz-screen">
+                    <div class="results-header">
+                        <div class="results-icon" id="results-icon">🎉</div>
+                        <h3 id="results-title">¡Quiz Completado!</h3>
+                        <p id="results-subtitle">Has completado el quiz de tipos</p>
+                    </div>
+                    
+                    <div class="results-stats">
+                        <div class="result-stat">
+                            <span class="stat-number" id="final-score">0</span>
+                            <span class="stat-label">Puntuación</span>
+                        </div>
+                        <div class="result-stat">
+                            <span class="stat-number" id="correct-count">0</span>
+                            <span class="stat-label">Correctas</span>
+                        </div>
+                        <div class="result-stat">
+                            <span class="stat-number" id="accuracy-percent">0%</span>
+                            <span class="stat-label">Precisión</span>
+                        </div>
+                        <div class="result-stat">
+                            <span class="stat-number" id="time-taken">0s</span>
+                            <span class="stat-label">Tiempo</span>
+                        </div>
+                    </div>
+                    
+                    <div class="results-breakdown">
+                        <h4>Desglose de Respuestas</h4>
+                        <div id="answers-breakdown" class="answers-list">
+                            <!-- El desglose se insertará aquí -->
+                        </div>
+                    </div>
+                    
+                    <div class="achievements-unlocked" id="achievements-container" style="display: none;">
+                        <h4>🎖️ Logros Desbloqueados</h4>
+                        <div id="achievements-list" class="achievements-list">
+                            <!-- Logros se insertarán aquí -->
+                        </div>
+                    </div>
+                    
+                    <div class="results-actions">
+                        <button id="quiz-restart" class="pokedex-button">Jugar de Nuevo</button>
+                        <button id="quiz-change-mode" class="pokedex-button secondary">Cambiar Modo</button>
+                        <button id="quiz-leaderboard" class="pokedex-button secondary">Leaderboard</button>
+                    </div>
+                </div>
+
+                <!-- Pantalla de Leaderboard -->
+                <div id="quiz-leaderboard-screen" class="quiz-screen">
+                    <div class="leaderboard-header">
+                        <h3>🏆 Leaderboard</h3>
+                        <p>Mejores puntuaciones por modo</p>
+                    </div>
+                    
+                    <div class="leaderboard-tabs">
+                        <button class="leaderboard-tab active" data-mode="types">Tipos</button>
+                        <button class="leaderboard-tab" data-mode="names">Nombres</button>
+                        <button class="leaderboard-tab" data-mode="stats">Stats</button>
+                        <button class="leaderboard-tab" data-mode="evolutions">Evoluciones</button>
+                    </div>
+                    
+                    <div class="leaderboard-content">
+                        <div id="leaderboard-list" class="leaderboard-list">
+                            <!-- Leaderboard se insertará aquí -->
+                        </div>
+                    </div>
+                    
+                    <div class="leaderboard-actions">
+                        <button id="leaderboard-back" class="pokedex-button secondary">Volver</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Historial -->
+    <div id="history-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Historial de Navegación</h2>
+                <button class="close-button">&times;</button>
+            </div>
+            <div class="history-container">
+                <div id="history-list">
+                    <!-- El historial se generará dinámicamente -->
+                </div>
+                <div class="history-actions">
+                    <button id="clear-history" class="pokedex-button secondary">Limpiar Historial</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Pokémon 3D Animado -->
+    <div id="pokemon-3d-modal" class="modal pokemon-3d-modal" style="display: none;">
+        <div class="modal-content pokemon-3d-content">
+            <div class="modal-header">
+                <h2 id="pokemon-3d-title">Pokémon 3D Interactivo</h2>
+                <button class="close-button pokemon-3d-close">&times;</button>
+            </div>
+            <model-viewer id="pokemon-3d-viewer" class="pokemon-3d-viewer" camera-controls="" touch-action="pan-y" environment-image="neutral" animation-name="" ar-status="not-presenting"></model-viewer>
+            <div class="pokemon-3d-controls">
+                <p>🖱️ Arrastra para rotar | 🔍 Rueda para zoom</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTÓN FLOTANTE - FUERA DE TODOS LOS MODALES, EN LA PÁGINA PRINCIPAL -->
+    <button id="team-btn" class="pokedex-button floating-btn">
+        🛡️ Mi Equipo
+    </button>
+    <!-- BOTÓN FLOTANTE TABLA DE TIPOS - FUERA DE TODOS LOS MODALES -->
+    <button id="type-chart-btn" class="pokedex-button floating-btn type-chart-btn">
+        📈 Tabla de Tipos
+    </button>   
+
+    <button id="quiz-btn" class="pokedex-button floating-btn quiz-btn">
+        🎯 Quiz
+    </button>
+    <!-- Añadir junto a los otros botones flotantes -->
+    <button id="compare-btn" class="pokedex-button floating-btn">
+        ⚖️ Comparar
+    </button>
+    <!-- Elementos de audio para sonidos UI (generados por Web Audio API) -->
+    <audio id="click-sound" preload="auto" style="display: none;"></audio>
+    <audio id="hover-sound" preload="auto" style="display: none;"></audio>
+    <audio id="select-sound" preload="auto" style="display: none;"></audio>
+    
+    <!-- Audio para sonidos de Pokémon (dinámico) -->
+    <audio id="pokemon-cry" preload="auto" style="display: none;"></audio>
+    
+    <script src="script.js"></script>
+</body>
+</html>

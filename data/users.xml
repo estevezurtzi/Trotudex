@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<users>
+  <user>
+    <id>65a1b2c3d4e5f</id>
+    <username>ash</username>
+    <email>ash@pokemon.com</email>
+    <avatar>data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiM3OEM4NTAiLz48dGV4dCB4PSI1MCIgeT0iNjAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiPkE8L3RleHQ+PC9zdmc+</avatar>
+    <favorites>1,25,6</favorites>
+    <captured>1,4,7,25</captured>
+    <created_at>2024-01-12T10:30:00+00:00</created_at>
+    <password_hash>$2y$12$n0vJ9fVGOObFRP/8Imt8rO17ff/GuADBMzNh2AmbbGvspxQQwQE.S</password_hash>
+  </user>
+  <user>
+    <id>690fd61150bd4</id>
+    <username>iniguet</username>
+    <email>nigger@gmail.com</email>
+    <password>pollapolla</password>
+    <avatar>data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiMzMGE3ZDciLz48dGV4dCB4PSI1MCIgeT0iNjAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiPkk8L3RleHQ+PC9zdmc+</avatar>
+    <favorites>724,89,768,745,758,765</favorites>
+    <captured/>
+    <created_at>2025-11-09T00:45:21+01:00</created_at>
+  </user>
+  <user>
+    <id>6910a7ca206d6</id>
+    <username>adsd</username>
+    <email>asdas@sda.com</email>
+    <password>aaaaaaaaaaa</password>
+    <avatar>data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNBMDQwQTAiLz48dGV4dCB4PSI1MCIgeT0iNjAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiPkE8L3RleHQ+PC9zdmc+</avatar>
+    <favorites/>
+    <captured/>
+    <created_at>2025-11-09T15:40:10+01:00</created_at>
+  </user>
+</users>
